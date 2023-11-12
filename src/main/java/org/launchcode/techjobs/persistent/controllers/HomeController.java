@@ -12,10 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -35,9 +32,8 @@ public class HomeController {
 
     @RequestMapping("/")
     public String index(Model model) {
-
         model.addAttribute("title", "MyJobs");
-
+        model.addAttribute("jobs", jobRepository.findAll());
         return "index";
     }
 
@@ -69,15 +65,22 @@ public class HomeController {
 
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         newJob.setSkills(skillObjs);
-
+        model.addAttribute(employerId);
         jobRepository.save(newJob);
-        return "redirect:./";
+        return "redirect:";
     }
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
 
+        Optional<Job> optJob = jobRepository.findById(jobId);
+        if (optJob.isPresent()) {
+            Job job = optJob.get();
+            model.addAttribute("job", job);
             return "view";
+        } else {
+            return "redirect:../";
+        }
     }
 
 }

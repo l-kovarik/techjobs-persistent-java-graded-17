@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
 @Controller
@@ -17,6 +16,13 @@ public class EmployerController {
 
     @Autowired
     EmployerRepository employerRepository;
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("title", "All Employers");
+        model.addAttribute("employers", employerRepository.findAll());
+        return "employers/index";
+    }
 
     @GetMapping("add")
     public String displayAddEmployerForm(Model model) {
@@ -29,12 +35,13 @@ public class EmployerController {
                                     Errors errors, Model model) {
 
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Create Employer");
+            model.addAttribute("employer", newEmployer);
             return "employers/add";
         }
-            employerRepository.save(newEmployer);
-            return "employers/index";
 
+        model.addAttribute("employer", newEmployer);
+        employerRepository.save(newEmployer);
+            return "redirect:/employers/";
     }
 
     @GetMapping("view/{employerId}")
@@ -46,16 +53,8 @@ public class EmployerController {
             model.addAttribute("employer", employer);
             return "employers/view";
         } else {
-            return "redirect:./";
+            return "redirect:../";
         }
-
-    }
-
-    @GetMapping("/")
-    public String index(Model model) {
-        model.addAttribute("title", "All Employers");
-        model.addAttribute("employers", employerRepository.findAll());
-        return "employers/index";
     }
 
 }
